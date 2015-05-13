@@ -38,7 +38,7 @@ public class ActUtils {
 	 * 定义流程定义KEY，必须以“PD_”开头
 	 * 组成结构：string[]{"流程标识","业务主表表名"}
 	 */
-	public static final String[] PD_LEAVE = new String[]{"leave", "oa_leave"};
+	public static final String[] PD_LEAVE = new String[]{"leaveFlow", "oa_leave"};
 	public static final String[] PD_TEST_AUDIT = new String[]{"test_audit", "oa_test_audit"};
 	
 //	/**

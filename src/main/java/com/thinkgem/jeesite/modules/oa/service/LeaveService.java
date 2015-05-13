@@ -15,6 +15,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,9 +117,15 @@ public class LeaveService extends BaseService {
 		List<Task> todoList = taskService.createTaskQuery().processDefinitionKey(ActUtils.PD_LEAVE[0]).taskAssignee(userId).active().orderByTaskPriority().desc().orderByTaskCreateTime().desc().list();
 		// 根据当前人未签收的任务
 		List<Task> unsignedTasks = taskService.createTaskQuery().processDefinitionKey(ActUtils.PD_LEAVE[0]).taskCandidateUser(userId).active().orderByTaskPriority().desc().orderByTaskCreateTime().desc().list();
+		
+		 // 根据当前人的ID查询
+        TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
+        List<Task> tasks2 = taskQuery.list();
+		
 		// 合并
 		tasks.addAll(todoList);
 		tasks.addAll(unsignedTasks);
+		tasks.addAll(tasks2);
 		// 根据流程的业务ID查询实体并关联
 		for (Task task : tasks) {
 			String processInstanceId = task.getProcessInstanceId();
