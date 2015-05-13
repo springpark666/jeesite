@@ -101,7 +101,7 @@
 						 }
 						 if(v=="yes"|| v=="no") {
 							complete(taskId,pid, [{
-								key: 'change',
+								key: 'reApply',
 								value: reApply,
 								type: 'B'
 							}, {
@@ -328,8 +328,8 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-	    <li class="active"><a href="${ctx}/oa/oaMyleave/task">我的任务</a></li>
-	    <li><a href="${ctx}/oa/oaMyleave/task/finished">已完成任务</a></li>
+	    <li><a href="${ctx}/oa/oaMyleave/task">我的任务</a></li>
+	    <li class="active"><a href="${ctx}/oa/oaMyleave/task/finished">已完成任务</a></li>
 		<li><a href="${ctx}/oa/oaMyleave/list">我的请假</a></li>
 		<shiro:hasPermission name="oa:oaMyleave:edit"><li><a href="${ctx}/oa/oaMyleave/form">请假添加</a></li></shiro:hasPermission>
 	</ul>
@@ -370,7 +370,15 @@
 					<td><fmt:formatDate value="${task.createTime}" type="both"/></td>
 					<td>${pi.suspended ? "已挂起" : "正常" }；<b title='流程版本号'>V: ${leave.processDefinition.version}</b></td>
 					<td>
-						<a target="_blank" href="${ctx}/act/task/trace/photo/${task.processDefinitionId}/${task.executionId}">跟踪</a>
+					    <a href="${ctx}/oa/oaMyleave/form?id=${leave.id}">详情</a>
+						<c:if test="${not empty pi}">
+							<a target="_blank" href="${ctx}/act/task/trace/photo/${task.processDefinitionId}/${task.executionId}">跟踪</a>
+							<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">跟踪1</a>
+					    </c:if>
+					    <c:if test="${empty pi}">
+							<a target="_blank" href="${ctx}/act/task/trace/photo/${leave.historicProcessInstance.processDefinitionId}/${leave.historicProcessInstance.processDefinitionId}">跟踪</a>
+							<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${leave.historicProcessInstance.processDefinitionId}&processInstanceId=${task.processInstanceId}">跟踪1</a>
+					    </c:if>
 						<c:if test="${empty task.assignee}">
 							<a class="claim" href="#" onclick="javescript:claim('${task.id}');">签收</a>
 						</c:if>

@@ -41,6 +41,7 @@ public class OaMyleave extends DataEntity<OaMyleave> {
 		private HistoricProcessInstance historicProcessInstance;
 		// 流程定义
 		private ProcessDefinition processDefinition;
+		private String userId;
 		
 		public String getLeaveTypeDictLabel() {
 			return DictUtils.getDictLabel(leaveType, "oa_leave_type", "");
@@ -164,6 +165,12 @@ public class OaMyleave extends DataEntity<OaMyleave> {
 
 	public void setProcessDefinition(ProcessDefinition processDefinition) {
 		this.processDefinition = processDefinition;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
 	

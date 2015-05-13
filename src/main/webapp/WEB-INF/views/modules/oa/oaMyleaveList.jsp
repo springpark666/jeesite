@@ -19,6 +19,7 @@
 <body>
 	<ul class="nav nav-tabs">
 	    <li><a href="${ctx}/oa/oaMyleave/task">我的任务</a></li>
+	    <li><a href="${ctx}/oa/oaMyleave/task/finished">已完成任务</a></li>
 		<li class="active"><a href="${ctx}/oa/oaMyleave/list">我的请假</a></li>
 		<shiro:hasPermission name="oa:oaMyleave:edit"><li><a href="${ctx}/oa/oaMyleave/form">请假添加</a></li></shiro:hasPermission>
 	</ul>

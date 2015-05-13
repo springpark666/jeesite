@@ -4,6 +4,7 @@
 package com.thinkgem.jeesite.modules.oa.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.act.service.ActTaskService;
 import com.thinkgem.jeesite.modules.act.utils.ActUtils;
 import com.thinkgem.jeesite.modules.oa.entity.Leave;
 import com.thinkgem.jeesite.modules.oa.entity.OaMyleave;
@@ -95,22 +98,57 @@ public class OaMyleaveService extends CrudService<OaMyleaveDao, OaMyleave> {
 				logger.debug("save entity: {}", oaMyleave);
 				
 				// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+				
+				
 				identityService.setAuthenticatedUserId(oaMyleave.getCurrentUser().getLoginName());
 				
-				// 启动流程
-				String businessKey = oaMyleave.getId().toString();
-				variables.put("type", "leave");
-				variables.put("busId", businessKey);
-				ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myleave",businessKey, variables);
-				oaMyleave.setProcessInstance(processInstance);
-				
-				// 更新流程实例ID
-				oaMyleave.setProcessInstanceId(processInstance.getId());
-				oaMyleaveDao.updateProcessInstanceId(oaMyleave);
-				
-				logger.debug("start process of {key={}, bkey={}, pid={}, variables={}}", new Object[] { 
-						ActUtils.PD_LEAVE[0], businessKey, processInstance.getId(), variables });
+				// 启动流程[新开一个流程]
+				if(StringUtils.isEmpty(oaMyleave.getProcessInstanceId())){
+					String businessKey = oaMyleave.getId().toString();
+					variables.put("type", "leave");
+					variables.put("busId", businessKey);
+					variables.put("createUser",oaMyleave.getCurrentUser().getLoginName());
+					ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myleave",businessKey, variables);
+					oaMyleave.setProcessInstance(processInstance);
+					
+					// 更新流程实例ID
+					oaMyleave.setProcessInstanceId(processInstance.getId());
+					oaMyleaveDao.updateProcessInstanceId(oaMyleave);
+					
+					logger.debug("start process of {key={}, bkey={}, pid={}, variables={}}", new Object[] { 
+							ActUtils.PD_LEAVE[0], businessKey, processInstance.getId(), variables });
+				}else{//【请假修改保持一个流程】
+					Task task=taskService.createTaskQuery().processInstanceId(oaMyleave.getProcessInstanceId()).singleResult();
+					Map<String,Object> var=new HashMap<String, Object>();
+					var.put("change",true);
+					taskService.complete(task.getId(),var);
+				}
 	}
+	
+	public List<OaMyleave> findFinishedTasks(){
+		 List<OaMyleave> results = new ArrayList<OaMyleave>();
+	        HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("myleave").finished().orderByProcessInstanceEndTime().desc();
+	        List<HistoricProcessInstance> list = query.list();
+
+	        // 关联业务实体
+	        for (HistoricProcessInstance historicProcessInstance : list) {
+	            String businessKey = historicProcessInstance.getBusinessKey();
+	            OaMyleave leave = oaMyleaveDao.get(businessKey);
+	            if(null==leave){
+	            	continue;
+	            }
+	            leave.setProcessDefinition(getProcessDefinition(historicProcessInstance.getProcessDefinitionId()));
+	            leave.setHistoricProcessInstance(historicProcessInstance);
+	            results.add(leave);
+	        }
+	        return results;
+	}
+	
+	protected ProcessDefinition getProcessDefinition(String processDefinitionId) {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+        return processDefinition;
+    }
+	
 	
 	/**
 	 * 查询待办任务

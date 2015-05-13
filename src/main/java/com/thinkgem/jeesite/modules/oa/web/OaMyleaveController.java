@@ -71,6 +71,15 @@ public class OaMyleaveController extends BaseController {
 	}
 	
 	@RequiresPermissions("oa:oaMyleave:view")
+	@RequestMapping(value = "task/finished")
+	public String finishedTask(OaMyleave oaMyleave, HttpServletRequest request, HttpServletResponse response, Model model) {
+		String userId = UserUtils.getUser().getLoginName();//ObjectUtils.toString(UserUtils.getUser().getId());
+		List<OaMyleave> results = oaMyleaveService.findFinishedTasks();
+		model.addAttribute("leaves", results);
+		return "modules/oa/oaMyleaveTaskFinished";
+	}
+	
+	@RequiresPermissions("oa:oaMyleave:view")
 	@RequestMapping(value = "list")
 	public String list(OaMyleave oaMyleave, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<OaMyleave> page = oaMyleaveService.findPage(new Page<OaMyleave>(request, response), oaMyleave); 
@@ -142,11 +151,14 @@ public class OaMyleaveController extends BaseController {
     public String complete(String taskId,String pid,Variable var) {
         try {
             Map<String, Object> variables = var.getVariableMap();
-           // taskService.complete(taskId, variables);
-         // 提交流程任务
-    		Map<String, Object> vars = Maps.newHashMap();
-    		vars.put("pass", "true".equals(var.getValues())? "1" : "0");
-    		actTaskService.complete(taskId,pid,"true".equals(var.getValues())? "同意" : var.getValues().split(",")[1], variables);
+            // taskService.complete(taskId, variables);
+            // 提交流程任务
+            if(null!=variables.get("change")){
+            	
+            	actTaskService.complete(taskId,pid,"已调整", variables);
+            }else{
+            	actTaskService.complete(taskId,pid,"true".equals(var.getValues())? "同意" : var.getValues().split(",")[1], variables);
+            }
             return "success";
         } catch (Exception e) {
             logger.error("error on complete task {}, variables={}", new Object[]{taskId, var.getVariableMap(), e});
