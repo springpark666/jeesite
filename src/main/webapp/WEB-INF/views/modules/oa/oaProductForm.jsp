@@ -27,6 +27,8 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
+	    <li><a href="${ctx}/oa/oaProduct/task">我的任务</a></li>
+	    <li><a href="${ctx}/oa/oaProduct/task/finished">已完成任务</a></li>
 		<li><a href="${ctx}/oa/oaProduct/">商品列表</a></li>
 		<li class="active"><a href="${ctx}/oa/oaProduct/form?id=${oaProduct.id}">商品<shiro:hasPermission name="oa:oaProduct:edit">${not empty oaProduct.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="oa:oaProduct:edit">查看</shiro:lacksPermission></a></li>
 	</ul><br/>
@@ -64,5 +66,6 @@
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>
 	</form:form>
+	<act:histoicFlow procInsId="${oaProduct.processInstanceId}"/>
 </body>
 </html>

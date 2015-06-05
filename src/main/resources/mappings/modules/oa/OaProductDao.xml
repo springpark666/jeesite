@@ -105,6 +105,12 @@
 		WHERE id = #{id}
 	</update>
 	
+	<update id="updateProcessInstanceId">
+		UPDATE oa_product SET 
+			process_instance_id = #{processInstanceId}
+		WHERE id = #{id}
+	</update>
+	
 	<update id="delete">
 		UPDATE oa_product SET 
 			del_flag = #{DEL_FLAG_DELETE}

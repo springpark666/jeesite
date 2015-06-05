@@ -3,6 +3,12 @@
  */
 package com.thinkgem.jeesite.modules.oa.entity;
 
+import java.util.Map;
+
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -18,7 +24,15 @@ public class OaProduct extends DataEntity<OaProduct> {
 	private String processInstanceId;		// 流程实例编号
 	private String name;		// 名称
 	private String type;		// 类目
-	
+	// 流程任务
+			private Task task;
+			private Map<String, Object> variables;
+			// 运行中的流程实例
+			private ProcessInstance processInstance;
+			// 历史的流程实例
+			private HistoricProcessInstance historicProcessInstance;
+			// 流程定义
+			private ProcessDefinition processDefinition;
 	public OaProduct() {
 		super();
 	}
@@ -52,6 +66,47 @@ public class OaProduct extends DataEntity<OaProduct> {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
+	}
+
+	public Map<String, Object> getVariables() {
+		return variables;
+	}
+
+	public void setVariables(Map<String, Object> variables) {
+		this.variables = variables;
+	}
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+	}
+
+	public HistoricProcessInstance getHistoricProcessInstance() {
+		return historicProcessInstance;
+	}
+
+	public void setHistoricProcessInstance(
+			HistoricProcessInstance historicProcessInstance) {
+		this.historicProcessInstance = historicProcessInstance;
+	}
+
+	public ProcessDefinition getProcessDefinition() {
+		return processDefinition;
+	}
+
+	public void setProcessDefinition(ProcessDefinition processDefinition) {
+		this.processDefinition = processDefinition;
 	}
 	
 }

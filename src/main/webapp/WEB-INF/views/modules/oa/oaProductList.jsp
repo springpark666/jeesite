@@ -18,6 +18,8 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
+	    <li><a href="${ctx}/oa/oaProduct/task">我的任务</a></li>
+	    <li><a href="${ctx}/oa/oaProduct/task/finished">已完成任务</a></li>
 		<li class="active"><a href="${ctx}/oa/oaProduct/">商品列表</a></li>
 		<shiro:hasPermission name="oa:oaProduct:edit"><li><a href="${ctx}/oa/oaProduct/form">商品添加</a></li></shiro:hasPermission>
 	</ul>
